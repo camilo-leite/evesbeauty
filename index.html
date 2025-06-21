@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EvesBeauty - Pestañas y Uñas Premium</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #ffeef8 0%, #f8e8ff 100%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b9d, #c44569);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #ff6b9d;
+        }
+
+        .cart-icon {
+            position: relative;
+            background: linear-gradient(45deg, #ff6b9d, #c44569);
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .cart-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4757;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        main {
+            margin-top: 80px;
+            padding: 2rem 0;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+            background: linear-gradient(135deg, rgba(255,107,157,0.1), rgba(196,69,105,0.1));
+            border-radius: 20px;
+            margin-bottom: 3rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #ff6b9d, #c44569);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .cta-button {
+            background: linear-gradient(45deg, #ff6b9d, #c44569);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255,107,157,0.3);
+        }
+
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .category-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .category-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .products-section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: #333;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #ffeef8, #f8e8ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: #ff6b9d;
+        }
+
+        .product-info {
+            padding: 1.5rem;
+        }
+
+        .product-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .product-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .product-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff6b9d;
+            margin-bottom: 1rem;
+        }
+
+        .add-to-cart {
+            width: 100%;
+            background: linear-gradient(45deg, #ff6b9d, #c44569);
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.3s;
+        }
+
+        .add-to-cart:hover {
+            opacity: 0.9;
+        }
+
+        .cart-sidebar {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            width: 400px;
+            height: 100vh;
+            background: white;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            transition: right 0.3s;
+            z-index: 1001;
+            overflow-y: auto;
+        }
+
+        .cart-sidebar.open {
+            right: 0;
+        }
+
+        .cart-header {
+            background: linear-gradient(45deg, #ff6b9d, #c44569);
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-cart {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .cart-items {
+            padding: 1rem;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .cart-item-price {
+            color: #ff6b9d;
+            font-weight: bold;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .quantity-btn {
+            background: #f0f0f0;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .remove-item {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .cart-total {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            border-radius: 10px;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            background: linear-gradient(45deg, #ff6b9d, #c44569);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 1000;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            color: #ff6b9d;
+            margin-bottom: 1rem;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            color: #ff6b9d;
+            font-size: 1.5rem;
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .cart-sidebar {
+                width: 100%;
+                right: -100%;
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: linear-gradient(45deg, #ff6b9d, #c44569);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateX(400px);
+            transition: transform 0.3s;
+            z-index: 1002;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .error-message {
+            background: #ffe6e6;
+            color: #d63031;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay" id="overlay"></div>
+    
+    <header>
+        <nav class="container">
+            <div class="logo">✨ EvesBeauty</div>
+            <ul class="nav-links">
+                <li><a href="#inicio">Inicio</a></li>
+                <li><a href="#productos">Productos</a></li>
+                <li><a href="#sobre-nosotros">Sobre Nosotros</a></li>
+                <li><a href="#contacto">Contacto</a></li>
+            </ul>
+            <button class="cart-icon" onclick="toggleCart()">
+                🛒
+                <span class="cart-count" id="cartCount">0</span>
+            </button>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="hero" id="inicio">
+            <h1>Realza tu Belleza Natural</h1>
+            <p>Pestañas y uñas de la más alta calidad para looks espectaculares</p>
+            <a href="#productos" class="cta-button">Ver Productos</a>
+        </section>
+
+        <section class="categories">
+            <div class="category-card" onclick="filterProducts('pestanas')">
+                <div class="category-icon">👁️</div>
+                <h3>Pestañas</h3>
+                <p>Extensiones de pestañas premium para una mirada impactante</p>
+            </div>
+            <div class="category-card" onclick="filterProducts('unas')">
+                <div class="category-icon">💅</div>
+                <h3>Uñas Postizas</h3>
+                <p>Diseños únicos y elegantes para tus manos</p>
+            </div>
+            <div class="category-card" onclick="filterProducts('accesorios')">
+                <div class="category-icon">✨</div>
+                <h3>Accesorios</h3>
+                <p>Todo lo que necesitas para el cuidado perfecto</p>
+            </div>
+        </section>
+
+        <section class="products-section" id="productos">
+            <h2 class="section-title">Productos Destacados</h2>
+            <div class="products-grid" id="productsGrid">
+                <!-- Los productos se cargarán aquí con JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3>Carrito de Compras</h3>
+            <button class="close-cart" onclick="toggleCart()">×</button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <p style="text-align: center; color: #666; padding: 2rem;">Tu carrito está vacío</p>
+        </div>
+        <div class="cart-total" id="cartTotal" style="display: none;">
+            <div style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: bold;">
+                <span>Total:</span>
+                <span id="totalAmount">$0</span>
+            </div>
+            <button class="checkout-btn" onclick="checkout()">Finalizar Compra</button>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        Producto agregado al carrito ✅
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Contacto</h3>
+                    <p>📞 +54 11 1234-5678</p>
+                    <p>📧 info@evesbeauty.com</p>
+                    <p>📍 Buenos Aires, Argentina</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Métodos de Pago</h3>
+                    <p>💳 Tarjetas de crédito y débito</p>
+                    <p>💰 Mercado Pago</p>
+                    <p>🏪 Efectivo en punto de retiro</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Síguenos</h3>
+                    <div class="social-links">
+                        <a href="#">📘</a>
+                        <a href="#">📷</a>
+                        <a href="#">💬</a>
+                    </div>
+                </div>
+            </div>
+            <p>&copy; 2025 EvesBeauty. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Variable global para productos
+        let products = [];
+        let cart = [];
+        let currentFilter = 'all';
+
+        // Función para cargar productos desde Netlify Functions
+        async function loadProductsFromAirtable() {
+            try {
+                console.log('🔄 Cargando productos desde Netlify Functions...');
+                
+                // Usar la función de Netlify en lugar de llamar directamente a Airtable
+                const response = await fetch('/.netlify/functions/get-products');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('📊 Datos recibidos de Airtable:', data);
+                
+                // Transformar datos de Airtable al formato que usa la web
+                products = data.records
+                    .filter(record => record.fields.Activo !== false)
+                    .map(record => ({
+                        id: record.id,
+                        name: record.fields.Nombre || 'Producto sin nombre',
+                        category: mapCategory(record.fields.Categoria),
+                        price: record.fields.Precio || 0,
+                        description: record.fields.Descripcion || 'Sin descripción',
+                        image: record.fields.Imagen && record.fields.Imagen[0] ? record.fields.Imagen[0].url : null,
+                        stock: record.fields.Stock || 0,
+                        featured: record.fields.Destacado || false,
+                        icon: getCategoryIcon(record.fields.Categoria)
+                    }));
+
+                console.log(`✅ Cargados ${products.length} productos desde Airtable vía Netlify`);
+                return products;
+
+            } catch (error) {
+                console.error('❌ Error cargando productos:', error);
+                showError('Error cargando productos desde la base de datos. Mostrando productos de ejemplo.');
+                // Fallback: productos de ejemplo
+                return loadExampleProducts();
+            }
+        }
+
+        // Productos de ejemplo para pruebas y fallback
+        function loadExampleProducts() {
+            products = [
+                {
+                    id: 'ejemplo1',
+                    name: "Pestañas Volumen Natural",
+                    category: "pestanas", 
+                    price: 2800,
+                    description: "Pestañas de seda premium para un look natural y elegante",
+                    icon: "👁️",
+                    stock: 15,
+                    featured: true
+                },
+                {
+                    id: 'ejemplo2',
+                    name: "Uñas Francesas Premium",
+                    category: "unas",
+                    price: 2200,
+                    description: "Diseño clásico francés con acabado profesional",
+                    icon: "💅",
+                    stock: 8,
+                    featured: false
+                },
+                {
+                    id: 'ejemplo3',
+                    name: "Kit Completo de Cuidado",
+                    category: "accesorios", 
+                    price: 1600,
+                    description: "Todo lo necesario para mantener tus pestañas perfectas",
+                    icon: "✨",
+                    stock: 12,
+                    featured: true
+                },
+                {
+                    id: 'ejemplo4',
+                    name: "Pestañas Efecto Dramático", 
+                    category: "pestanas",
+                    price: 3200,
+                    description: "Para looks de noche y ocasiones especiales",
+                    icon: "🌟",
+                    stock: 6,
+                    featured: false
+                }
+            ];
+            
+            console.log(`✅ Usando ${products.length} productos de ejemplo`);
+            return products;
+        }
+
+        // Mapear categorías de Airtable a las usadas en la web
+        function mapCategory(airtableCategory) {
+            if (!airtableCategory) return 'accesorios';
+            
+            const categoryMap = {
+                'Pestañas': 'pestanas',
+                'pestañas': 'pestanas',
+                'Pestanas': 'pestanas',
+                'pestanas': 'pestanas',
+                'Uñas': 'unas',
+                'uñas': 'unas',
+                'Unas': 'unas',
+                'unas': 'unas',
+                'Accesorios': 'accesorios',
+                'accesorios': 'accesorios'
+            };
+            
+            return categoryMap[airtableCategory.toLowerCase()] || 'accesorios';
+        }
+
+        // Obtener icono según categoría
+        function getCategoryIcon(category) {
+            if (!category) return '✨';
+            
+            const iconMap = {
+                'Pestañas': '👁️',
+                'pestañas': '👁️',
+                'Pestanas': '👁️',
+                'pestanas': '👁️',
+                'Uñas': '💅',
+                'uñas': '💅',
+                'Unas': '💅',
+                'unas': '💅',
+                'Acceso
