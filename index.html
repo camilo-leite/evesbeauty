@@ -561,53 +561,12 @@
     </footer>
 
     <script>
-        // Variable global para productos
+        // Variables globales
         let products = [];
         let cart = [];
         let currentFilter = 'all';
 
-        // Función para cargar productos desde Netlify Functions
-        async function loadProductsFromAirtable() {
-            try {
-                console.log('🔄 Cargando productos desde Netlify Functions...');
-                
-                // Usar la función de Netlify en lugar de llamar directamente a Airtable
-                const response = await fetch('/.netlify/functions/get-products');
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                console.log('📊 Datos recibidos de Airtable:', data);
-                
-                // Transformar datos de Airtable al formato que usa la web
-                products = data.records
-                    .filter(record => record.fields.Activo !== false)
-                    .map(record => ({
-                        id: record.id,
-                        name: record.fields.Nombre || 'Producto sin nombre',
-                        category: mapCategory(record.fields.Categoria),
-                        price: record.fields.Precio || 0,
-                        description: record.fields.Descripcion || 'Sin descripción',
-                        image: record.fields.Imagen && record.fields.Imagen[0] ? record.fields.Imagen[0].url : null,
-                        stock: record.fields.Stock || 0,
-                        featured: record.fields.Destacado || false,
-                        icon: getCategoryIcon(record.fields.Categoria)
-                    }));
-
-                console.log(`✅ Cargados ${products.length} productos desde Airtable vía Netlify`);
-                return products;
-
-            } catch (error) {
-                console.error('❌ Error cargando productos:', error);
-                showError('Error cargando productos desde la base de datos. Mostrando productos de ejemplo.');
-                // Fallback: productos de ejemplo
-                return loadExampleProducts();
-            }
-        }
-
-        // Productos de ejemplo para pruebas y fallback
+        // Productos de ejemplo
         function loadExampleProducts() {
             products = [
                 {
@@ -649,44 +608,235 @@
                     icon: "🌟",
                     stock: 6,
                     featured: false
+                },
+                {
+                    id: 'ejemplo5',
+                    name: "Uñas Ombré Elegante",
+                    category: "unas",
+                    price: 2600,
+                    description: "Efecto degradado suave en tonos nude y rosa",
+                    icon: "💅",
+                    stock: 10,
+                    featured: true
+                },
+                {
+                    id: 'ejemplo6',
+                    name: "Pegamento Profesional",
+                    category: "accesorios",
+                    price: 850,
+                    description: "Adhesivo de larga duración para pestañas",
+                    icon: "🧪",
+                    stock: 20,
+                    featured: false
                 }
             ];
             
-            console.log(`✅ Usando ${products.length} productos de ejemplo`);
-            return products;
+            console.log(`✅ Cargados ${products.length} productos de ejemplo`);
+            renderProducts();
         }
 
-        // Mapear categorías de Airtable a las usadas en la web
-        function mapCategory(airtableCategory) {
-            if (!airtableCategory) return 'accesorios';
-            
-            const categoryMap = {
-                'Pestañas': 'pestanas',
-                'pestañas': 'pestanas',
-                'Pestanas': 'pestanas',
-                'pestanas': 'pestanas',
-                'Uñas': 'unas',
-                'uñas': 'unas',
-                'Unas': 'unas',
-                'unas': 'unas',
-                'Accesorios': 'accesorios',
-                'accesorios': 'accesorios'
-            };
-            
-            return categoryMap[airtableCategory.toLowerCase()] || 'accesorios';
+        // Renderizar productos
+        function renderProducts() {
+            const grid = document.getElementById('productsGrid');
+            const filteredProducts = currentFilter === 'all' 
+                ? products 
+                : products.filter(p => p.category === currentFilter);
+
+            if (filteredProducts.length === 0) {
+                grid.innerHTML = '<div class="loading">No se encontraron productos.</div>';
+                return;
+            }
+
+            grid.innerHTML = filteredProducts.map(product => `
+                <div class="product-card" data-category="${product.category}">
+                    <div class="product-image">${product.icon}</div>
+                    <div class="product-info">
+                        <div class="product-title">${product.name}</div>
+                        <div class="product-description">${product.description}</div>
+                        <div class="product-price">$${product.price.toLocaleString()}</div>
+                        <button class="add-to-cart" onclick="addToCart('${product.id}')" 
+                                ${product.stock === 0 ? 'disabled' : ''}>
+                            ${product.stock === 0 ? 'Sin Stock' : 'Agregar al Carrito'}
+                        </button>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        // Obtener icono según categoría
-        function getCategoryIcon(category) {
-            if (!category) return '✨';
+        // Filtrar productos por categoría
+        function filterProducts(category) {
+            currentFilter = category;
+            renderProducts();
             
-            const iconMap = {
-                'Pestañas': '👁️',
-                'pestañas': '👁️',
-                'Pestanas': '👁️',
-                'pestanas': '👁️',
-                'Uñas': '💅',
-                'uñas': '💅',
-                'Unas': '💅',
-                'unas': '💅',
-                'Acceso
+            // Scroll a la sección de productos
+            document.getElementById('productos').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+
+        // Agregar producto al carrito
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product || product.stock === 0) return;
+
+            const existingItem = cart.find(item => item.id === productId);
+            
+            if (existingItem) {
+                if (existingItem.quantity < product.stock) {
+                    existingItem.quantity++;
+                } else {
+                    showNotification('Sin más stock disponible', 'error');
+                    return;
+                }
+            } else {
+                cart.push({
+                    id: productId,
+                    name: product.name,
+                    price: product.price,
+                    quantity: 1,
+                    icon: product.icon
+                });
+            }
+
+            updateCartUI();
+            showNotification('Producto agregado al carrito ✅');
+        }
+
+        // Actualizar interfaz del carrito
+        function updateCartUI() {
+            const cartCount = document.getElementById('cartCount');
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
+            const totalAmount = document.getElementById('totalAmount');
+
+            // Actualizar contador
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.textContent = totalItems;
+
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">Tu carrito está vacío</p>';
+                cartTotal.style.display = 'none';
+                return;
+            }
+
+            // Mostrar items del carrito
+            cartItems.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <div class="cart-item-info">
+                        <div class="cart-item-title">${item.icon} ${item.name}</div>
+                        <div class="cart-item-price">$${item.price.toLocaleString()}</div>
+                        <div class="quantity-controls">
+                            <button class="quantity-btn" onclick="updateQuantity('${item.id}', -1)">-</button>
+                            <span>${item.quantity}</span>
+                            <button class="quantity-btn" onclick="updateQuantity('${item.id}', 1)">+</button>
+                        </div>
+                    </div>
+                    <button class="remove-item" onclick="removeFromCart('${item.id}')">🗑️</button>
+                </div>
+            `).join('');
+
+            // Calcular y mostrar total
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            totalAmount.textContent = `$${total.toLocaleString()}`;
+            cartTotal.style.display = 'block';
+        }
+
+        // Actualizar cantidad
+        function updateQuantity(productId, change) {
+            const item = cart.find(item => item.id === productId);
+            const product = products.find(p => p.id === productId);
+            
+            if (!item || !product) return;
+
+            const newQuantity = item.quantity + change;
+            
+            if (newQuantity <= 0) {
+                removeFromCart(productId);
+                return;
+            }
+            
+            if (newQuantity > product.stock) {
+                showNotification('Sin más stock disponible', 'error');
+                return;
+            }
+
+            item.quantity = newQuantity;
+            updateCartUI();
+        }
+
+        // Remover del carrito
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCartUI();
+            showNotification('Producto eliminado del carrito');
+        }
+
+        // Toggle carrito
+        function toggleCart() {
+            const cartSidebar = document.getElementById('cartSidebar');
+            const overlay = document.getElementById('overlay');
+            
+            cartSidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+        }
+
+        // Cerrar carrito al hacer clic en overlay
+        document.getElementById('overlay').addEventListener('click', toggleCart);
+
+        // Checkout
+        function checkout() {
+            if (cart.length === 0) {
+                showNotification('El carrito está vacío', 'error');
+                return;
+            }
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const message = `¡Hola! Quiero realizar una compra:\n\n${cart.map(item => `• ${item.name} x${item.quantity} - $${(item.price * item.quantity).toLocaleString()}`).join('\n')}\n\n*Total: $${total.toLocaleString()}*`;
+            
+            const whatsappUrl = `https://wa.me/5491123456789?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+            
+            showNotification('Redirigiendo a WhatsApp...');
+        }
+
+        // Mostrar notificación
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Mostrar error
+        function showError(message) {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = `<div class="error-message">${message}</div>`;
+        }
+
+        // Navegación suave
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Iniciando EvesBeauty...');
+            loadExampleProducts();
+        });
+
+        // Manejo de errores globales
+        window.addEventListener('error', function(e) {
+            console.error('Error en la aplicación:', e.error);
+        });
+    </script>
+</body>
+</html>
